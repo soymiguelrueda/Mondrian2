@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorea el cuadro</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    canvas { border: 2px solid black; touch-action: none; cursor: crosshair; }
+    .palette { margin-top: 10px; }
+    .color-btn {
+      width: 30px;
+      height: 30px;
+      display: inline-block;
+      border: 1px solid #000;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Color the Mondrian painting / Colorea el cuadro de Mondrian</h2>
+<canvas id="paintCanvas" width="600" height="400"></canvas>
+
+<div class="palette">
+  <div class="color-btn" style="background: red;" onclick="setColor('red')"></div>
+  <div class="color-btn" style="background: blue;" onclick="setColor('blue')"></div>
+  <div class="color-btn" style="background: yellow;" onclick="setColor('yellow')"></div>
+  <div class="color-btn" style="background: white;" onclick="setColor('white')"></div>
+  <div class="color-btn" style="background: black;" onclick="setColor('black')"></div>
+</div>
+
+<button onclick="clearCanvas()">Borrar</button>
+<button onclick="saveImage()">Guardar dibujo</button>
+
+<script>
+  const canvas = document.getElementById('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  let painting = false;
+  let currentColor = 'red';
+
+  const img = new Image();
+  img.src = 'mondrian.png';  // La imagen debe estar en la misma carpeta
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+
+  function setColor(color) {
+    currentColor = color;
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+
+  function saveImage() {
+    const link = document.createElement('a');
+    link.download = 'mi-dibujo.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+
+  canvas.addEventListener('mousedown', () => painting = true);
+  canvas.addEventListener('mouseup', () => painting = false);
+  canvas.addEventListener('mouseleave', () => painting = false);
+  canvas.addEventListener('mousemove', draw);
+
+  function draw(e) {
+    if (!painting) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    ctx.fillStyle = currentColor;
+    ctx.beginPath();
+    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.fill();
+  }
+</script>
+
+</body>
+</html>
